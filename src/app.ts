@@ -56,7 +56,7 @@ class ProjectInput {
       enteredDescription.trim().length === 0 ||
       enteredManday.trim().length === 0
     ) {
-      alert('入力値が正しくありません。もう一度お試しください。');
+      alert('入力値が正しくありません。再度お試しください。');
       return;
     } else {
       return [enteredTitle, enteredDescription, +enteredManday];
