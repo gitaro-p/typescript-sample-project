@@ -80,7 +80,7 @@ function autobind(_, _2, descriptor) {
         get() {
             const boundFn = originalMethod.bind(this);
             return boundFn;
-        },
+        }
     };
     return adjDescriptor;
 }
@@ -97,6 +97,20 @@ class Component {
     }
     attach(insertAtBeginning) {
         this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
+    }
+}
+class ProjectItem extends Component {
+    constructor(hostId, project) {
+        super('single-project', hostId, false, project.id);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
+    configure() { }
+    renderContent() {
+        this.element.querySelector('h2').textContent = this.project.title;
+        this.element.querySelector('h3').textContent = this.project.manday.toString();
+        this.element.querySelector('p').textContent = this.project.description;
     }
 }
 class ProjectList extends Component {
@@ -129,9 +143,7 @@ class ProjectList extends Component {
         const listEl = document.getElementById(`${this.type}-projects-list`);
         listEl.innerHTML = '';
         for (const prjItem of this.assignedProjects) {
-            const listItem = document.createElement('li');
-            listItem.textContent = prjItem.title;
-            listEl.appendChild(listItem);
+            new ProjectItem(listEl.id, prjItem);
         }
     }
 }
@@ -153,18 +165,18 @@ class ProjectInput extends Component {
         const enteredManday = this.mandayInputElement.value;
         const titleValidatable = {
             value: enteredTitle,
-            required: true,
+            required: true
         };
         const descriptionValidatable = {
             value: enteredDescription,
             required: true,
-            minLength: 5,
+            minLength: 5
         };
         const mandayValidatable = {
             value: +enteredManday,
             required: true,
             min: 1,
-            max: 1000,
+            max: 1000
         };
         if (!validate(titleValidatable) ||
             !validate(descriptionValidatable) ||
