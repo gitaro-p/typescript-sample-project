@@ -13,7 +13,7 @@ interface DragTarget {
 // Project Type
 enum ProjectStatus {
   Active,
-  Finished
+  Finished,
 }
 
 class Project {
@@ -22,7 +22,7 @@ class Project {
     public title: string,
     public description: string,
     public manday: number,
-    public status: ProjectStatus
+    public status: ProjectStatus,
   ) {}
 }
 
@@ -59,7 +59,7 @@ class ProjectState extends State<Project> {
       title,
       description,
       manday,
-      ProjectStatus.Active
+      ProjectStatus.Active,
     );
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
@@ -122,7 +122,7 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
     get() {
       const boundFn = originalMethod.bind(this);
       return boundFn;
-    }
+    },
   };
   return adjDescriptor;
 }
@@ -137,16 +137,16 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     templateId: string,
     hostElementId: string,
     insertAtStart: boolean,
-    newElementId?: string
+    newElementId?: string,
   ) {
     this.templateElement = document.getElementById(
-      templateId
+      templateId,
     )! as HTMLTemplateElement;
     this.hostElement = document.getElementById(hostElementId)! as T;
 
     const importedNode = document.importNode(
       this.templateElement.content,
-      true
+      true,
     );
     this.element = importedNode.firstElementChild as U;
     if (newElementId) {
@@ -162,7 +162,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   private attach(insertAtBeginning: boolean) {
     this.hostElement.insertAdjacentElement(
       insertAtBeginning ? 'afterbegin' : 'beforeend',
-      this.element
+      this.element,
     );
   }
 }
@@ -210,7 +210,8 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
 }
 
 // ProjectList Class
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectList extends Component<HTMLDivElement, HTMLElement>
+  implements DragTarget {
   assignedProjects: Project[];
 
   constructor(private type: 'active' | 'finished') {
@@ -221,7 +222,25 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     this.renderContent();
   }
 
+  @autobind
+  dragOverHandler(_: DragEvent) {
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.add('droppable');
+  }
+
+  dropHandler(_: DragEvent) {}
+
+  @autobind
+  dragLeaveHandler(_: DragEvent) {
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.remove('droppable');
+  }
+
   configure() {
+    this.element.addEventListener('dragover', this.dragOverHandler);
+    this.element.addEventListener('drop', this.dropHandler);
+    this.element.addEventListener('dragleave', this.dragLeaveHandler);
+
     projectState.addListener((projects: Project[]) => {
       const relevantProjects = projects.filter(prj => {
         if (this.type === 'active') {
@@ -243,7 +262,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 
   private renderProjects() {
     const listEl = document.getElementById(
-      `${this.type}-projects-list`
+      `${this.type}-projects-list`,
     )! as HTMLUListElement;
     listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
@@ -262,13 +281,13 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     super('project-input', 'app', true, 'user-input');
 
     this.titleInputElement = this.element.querySelector(
-      '#title'
+      '#title',
     ) as HTMLInputElement;
     this.descriptionInputElement = this.element.querySelector(
-      '#description'
+      '#description',
     ) as HTMLInputElement;
     this.mandayInputElement = this.element.querySelector(
-      '#manday'
+      '#manday',
     ) as HTMLInputElement;
 
     this.configure();
@@ -287,18 +306,18 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
     const titleValidatable: Validatable = {
       value: enteredTitle,
-      required: true
+      required: true,
     };
     const descriptionValidatable: Validatable = {
       value: enteredDescription,
       required: true,
-      minLength: 5
+      minLength: 5,
     };
     const mandayValidatable: Validatable = {
       value: +enteredManday,
       required: true,
       min: 1,
-      max: 1000
+      max: 1000,
     };
     if (
       !validate(titleValidatable) ||
