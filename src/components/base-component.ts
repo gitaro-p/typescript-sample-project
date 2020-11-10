@@ -1,5 +1,4 @@
-namespace App {
-  // Component Class
+// Component Class
 export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   templateElement: HTMLTemplateElement;
   hostElement: T;
@@ -9,16 +8,16 @@ export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     templateId: string,
     hostElementId: string,
     insertAtStart: boolean,
-    newElementId?: string,
+    newElementId?: string
   ) {
     this.templateElement = document.getElementById(
-      templateId,
+      templateId
     )! as HTMLTemplateElement;
     this.hostElement = document.getElementById(hostElementId)! as T;
 
     const importedNode = document.importNode(
       this.templateElement.content,
-      true,
+      true
     );
     this.element = importedNode.firstElementChild as U;
     if (newElementId) {
@@ -34,8 +33,7 @@ export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   private attach(insertAtBeginning: boolean) {
     this.hostElement.insertAdjacentElement(
       insertAtBeginning ? 'afterbegin' : 'beforeend',
-      this.element,
+      this.element
     );
   }
-}
 }
